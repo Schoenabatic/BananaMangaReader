@@ -51,19 +51,13 @@ def home():
 def GetRes():
     search_results.clear()
     return flask.render_template('searchpage.html')
-
+``
 @app.route("/results/<srch>", methods=["POST","GET"])
 def ShowRes(srch):
     user_selections['manga']=1000000 #reset global tracking
     search_string=flask.request.form["srchstr"]
-    a=search_string.replace("'","")
-    a=a.split(' ')
-    usable_search_string=''
-    for i in range(len(a)):
-        if i==0:
-            usable_search_string=usable_search_string+a[i]
-        else:
-            usable_search_string=usable_search_string+'-'+a[i]
+    usable_search_string = (search_string.replace("'","")).replace(" ", "-") # removes apostrophes and joins words with -
+            
     
     #title search:
     data1=requests.get('https://mangakakalot.com/search/story/'+usable_search_string, headers={'User-agent': 'Mozilla/5.0'}).text
