@@ -102,6 +102,8 @@ def ShowRes(srch):
                     'url': manga_url,
                     'title': manga_title,
                     'img': manga_img,
+                    'author': "Lorem Ipsum",
+                    'last_ch': "1"
                 }
     
     
