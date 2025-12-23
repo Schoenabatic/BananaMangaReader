@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Banana Manga Reader: Search Results</title>
+
     <link
       rel="stylesheet"
       type="text/css"
@@ -9,17 +10,73 @@
     />
 
     <style>
+      /* Global box model fix */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
       body {
         font-family: Georgia, Garamond, Serif;
         background: #f7f7f7;
         color: #000;
+        margin: 0;
+        padding: 0;
       }
 
       h3 {
         margin: 12px;
       }
 
-      /* Grid layout */
+      /* ================= SEARCH CARD ================= */
+
+      .search-card {
+        max-width: 420px;
+        margin: 60px auto 30px auto;
+        background: #ffffff;
+        border: 1.5px solid #bbb;
+        border-radius: 18px;
+        padding: 26px;
+        text-align: center;
+      }
+
+      .search-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .search-card input[type="text"] {
+        width: 100%;
+        height: 44px;
+        font-size: 18px;
+        padding: 10px 12px;
+        border: 2px solid #999;
+        border-radius: 12px;
+        margin-bottom: 18px;
+      }
+
+      .search-card input[type="text"]::placeholder {
+        color: #666;
+      }
+
+      .search-card input[type="submit"] {
+        width: 100%;
+        font-size: 18px;
+        padding: 12px;
+        border: 2px solid #111;
+        background: #111;
+        color: #fff;
+        border-radius: 12px;
+      }
+
+      .search-card input[type="submit"]:active {
+        background: #333;
+      }
+
+      /* ================= RESULTS GRID ================= */
+
       .results-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -27,7 +84,8 @@
         padding: 12px;
       }
 
-      /* Manga card */
+      /* ================= MANGA CARD ================= */
+
       .manga-card {
         display: flex;
         background: #ffffff;
@@ -42,7 +100,6 @@
         background: #eaeaea;
       }
 
-      /* Cover image */
       .manga-cover {
         width: 120px;
         height: auto;
@@ -51,7 +108,6 @@
         flex-shrink: 0;
       }
 
-      /* Info section */
       .manga-info {
         display: flex;
         flex-direction: column;
@@ -73,13 +129,11 @@
       .label {
         font-weight: bold;
       }
-
-      /* Kobo-safe: no hover effects, no shadows */
     </style>
   </head>
 
   <body>
-    <!-- Hamburger menu (unchanged) -->
+    <!-- Hamburger menu -->
     <div class="hamburger-menu">
       <input id="menu__toggle" type="checkbox" />
       <label class="menu__btn" for="menu__toggle"><span></span></label>
@@ -95,16 +149,17 @@
     </div>
 
     <!-- Search -->
-    <center>
+    <div class="search-card">
+      <div class="search-title">Search Manga</div>
       <form action="#" method="POST" id="searchForm">
-        <p>Search Manga</p>
-        <p><input type="text" name="srchstr" /></p>
-        <p><input type="submit" value="Search" /></p>
+        <input type="text" name="srchstr" placeholder="e.g. demon slayer" />
+        <input type="submit" value="Search" />
       </form>
-    </center>
+    </div>
 
     <h3>Results</h3>
 
+    <!-- Results -->
     <div class="results-grid">
       {% if n_manga > 0 %} {% for key in res %}
       <a class="manga-card" href="/manga_result/choice/{{ key }}">
@@ -116,11 +171,9 @@
 
         <div class="manga-info">
           <div class="manga-title">{{ res[key]['title'] }}</div>
-
           <div class="manga-meta">
             <span class="label">Author:</span>
             {{ res[key].get('author', 'Unknown') }}<br />
-
             <span class="label">Latest Chapter:</span>
             {{ res[key].get('last_ch', '—') }}
           </div>
