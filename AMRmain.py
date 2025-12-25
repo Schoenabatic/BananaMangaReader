@@ -124,6 +124,7 @@ def GetMangaData(usr_choice):
     
     manga_data['url']=search_results[str(manga_selected)]['url']
     manga_data['title']=search_results[str(manga_selected)]['title']
+    manga_data['img']=search_results[str(manga_selected)]['img']
     
     manga_page_url = 'https://cubari.moe/read/weebcentral/'+ manga_data['url'].split('/')[4] + '/'
     
@@ -141,6 +142,9 @@ def GetMangaData(usr_choice):
     for chapter in chapters_list:
         chapter_title = ''
         chapter_url = ''
+        
+        if not chapter.strip():
+            continue
     
         for line in chapter.split('\n'):
             if "Chapter" in line:
@@ -148,10 +152,12 @@ def GetMangaData(usr_choice):
             
             if 'a href' in line:
                 chapter_url = line.split('href="')[1].split('">')[0]
-            
+        
+        if not chapter_title:
+            continue
+
         ch_title = chapter_title    
         ch_link= chapter_url
-        # print("chapter link = " + ch_link)
         
         ch_num = str(ch_title.replace("Chapter", "").strip())
         manga_data['ch_list'][ch_num]={'ch_link': ch_link,
@@ -160,7 +166,7 @@ def GetMangaData(usr_choice):
                                        'ch_url': '/manga_reader/ch/' + ch_num + '/p1'}
         
      
-    return flask.render_template('mangapage.html', n_ch=len( manga_data['ch_list'])-1, manga_data=manga_data)
+    return flask.render_template('mangapage.html', n_ch=len( manga_data['ch_list']), manga_data=manga_data)
 
 @app.route("/manga_reader/ch/<ch_no>/p<p_no>")
 def GetChap(ch_no,p_no):

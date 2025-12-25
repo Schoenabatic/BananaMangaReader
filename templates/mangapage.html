@@ -31,7 +31,7 @@
           <div class="manga-cover-container">
             <img
               class="manga-cover"
-              src="{{ url_for('static', filename='manga_cover/manga_cover.jpg') }}"
+              src="{{ manga_data['img'] }}"
               alt="Cover"
             />
           </div>
@@ -70,6 +70,7 @@
         </div>
 
         <h3>Chapters</h3>
+        {% if manga_data['ch_list']|length > 0 %}
         <div class="chapter-list">
           {% for key in manga_data['ch_list'] %}
           <a
@@ -85,6 +86,14 @@
           </a>
           {% endfor %}
         </div>
+        {% else %}
+        <div
+          class="description-box"
+          style="text-align: center; margin-top: 1rem"
+        >
+          <p>No chapters available.</p>
+        </div>
+        {% endif %}
       </div>
     </div>
   </body>
