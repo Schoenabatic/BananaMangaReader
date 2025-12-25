@@ -1,4 +1,7 @@
-# Atom Manga Reader
+<div align="center">
+  <img src="static/images/AMR_logo.svg" alt="Atom Manga Reader Logo" width="150" />
+  <h1>Atom Manga Reader</h1>
+</div>
 
 **Atom Manga Reader**, also referred to as **AMR**, is an application designed to read manga on Kobo eReaders.  
 It is a lightweight, Kobo-first manga reader focused on simplicity, performance, and minimal user interface, built to work within the constraints of Kobo devices and their built-in browser.
