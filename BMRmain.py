@@ -149,171 +149,163 @@ def GetMangaData(usr_choice):
             
         ch_title = chapter_title    
         ch_link= chapter_url
+        # print("chapter link = " + ch_link)
         
-        manga_data['ch_list'][str(ch_title.replace("Chapter", "").strip())]={'ch_link': ch_link,
-                                                'ch_title': ch_title,
-                                                'ch_update': 'N/A'}
+        ch_num = str(ch_title.replace("Chapter", "").strip())
+        manga_data['ch_list'][ch_num]={'ch_link': ch_link,
+                                       'ch_title': ch_title,
+                                       'ch_update': 'N/A',
+                                       'ch_url': '/manga_reader/ch/' + ch_num + '/p1'}
         
-    print(manga_data)
      
-            
-    
-    
-    # # open manga page, get chapter list: links and numbers
-    
-    # #Get author name:
-    # manga_data['author']=data2.split('/author/')[1].split('>')[1].split('<')[0]
-    
-    # #add description
-    # manga_data['description']=data2.split('"description"')[1].split('"')[1].replace('&quot;','"').replace("&#39;","'")
-    
-    # #get manga cover image
-    # #    first clear old image file
-    # try:
-    #     os.remove('static/manga_cover/manga_cover.jpg')
-    # except:
-    #     pass
-    # manga_cover_link=data2.split('"og:image" content')[1].split('"')[1]
-    # manga_cover_response=requests.get(manga_cover_link, verify=True)
-    # manga_cover=Image.open(io.BytesIO(manga_cover_response.content)).convert('RGB')
-    # manga_cover.save('static/manga_cover/manga_cover.jpg')
-    
-    # #get genres:
-    # manga_data['genres']=[]
-    # g_data=data2.split('Genres')[1].split('</li>')[0]
-    # g_data=g_data.split('</a>')
-    # n_genres=len(g_data)-1
-    # for i in range(n_genres):
-    #     if 'mangakakalot.com' in manga_data['url']:
-    #         g_n=g_data[i].split('>')[1]
-    #         manga_data['genres'].append(g_n)
-    #     elif 'readmanganato.com' in manga_data['url']:
-    #         if i not in [0,n_genres-1]:
-    #             g_n=g_data[i].split('>')[1]
-    #             manga_data['genres'].append(g_n)
-    
     return flask.render_template('mangapage.html', n_ch=len( manga_data['ch_list'])-1, manga_data=manga_data)
 
 @app.route("/manga_reader/ch/<ch_no>/p<p_no>")
 def GetChap(ch_no,p_no):
-    if user_selections['chapter']!=ch_no: #if new chapter is selected
+    headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+    "Accept": "application/json, text/plain, */*",
+    "Referer": "https://cubari.moe/",
+    "Origin": "https://cubari.moe"
+}
         
-        #clear old files from cache
-        dir2clear = 'static/chapter_cache'
-        for f in os.listdir(dir2clear):
-            os.remove(os.path.join(dir2clear, f))
-            
-        chapter_selected=ch_no
-        user_selections['chapter']=ch_no #update for global tracking
+    chapter_selected=ch_no
+    user_selections['chapter']=ch_no #update for global tracking
+    
+    
+    #! schoenbatic: open series data from the api which has the endpoints for all the chapters images
+    series_api_url = 'https://cubari.moe/read/api/weebcentral/series/' + manga_data['ch_list'][str(chapter_selected)]['ch_link'].strip('/').split('/')[2] + '/'
+    series_data = requests.get(series_api_url, headers={'User-agent': 'Mozilla/5.0'}).json()
+    
+    # print(series_data)
+    # ! schoenabtic: get chapter images
+    chapter_api_url = 'https://cubari.moe' + series_data['chapters'][str(chapter_selected)]['groups']['1']
+    chapter_data = requests.get(chapter_api_url, headers=headers).text
+    
+    print(chapter_data)
+
+    reader_src = chapter_data.strip()[1:-1].split('", "')
+    reader_src = [url.strip('"') for url in reader_src]  
+
+    return flask.render_template(
+        'mangareader3.html',
+        ch_no=ch_no,
+        p_no=int(p_no),
+        pg_last=len(reader_src),
+        reader_src=reader_src,
+        next_ch_link='#',
+        prev_ch_link='#',
+        manga_home_link='#'
+    )
+
+    
         
-        #open chapter page, get page links
-        data3=requests.get(manga_data['ch_list'][str(chapter_selected)]['ch_link'], headers={'User-agent': 'Mozilla/5.0'}).text
         
         #look for <div class="container-chapter-reader">
-        pg_data=data3.split('<div class="container-chapter-reader">')[1].split('\n')[1].split('<img src')
-        pg_links.clear()
+    #     pg_data=chapter_data.split('<div class="container-chapter-reader">')[1].split('\n')[1].split('<img src')
+    #     pg_links.clear()
         
-        n_pg=len(pg_data)-1
-        for i in range(n_pg):
-            each_pg_link=pg_data[i+1].split('"')[1]
-            pg_links[str(i+1)]=each_pg_link
+    #     n_pg=len(pg_data)-1
+    #     for i in range(n_pg):
+    #         each_pg_link=pg_data[i+1].split('"')[1]
+    #         pg_links[str(i+1)]=each_pg_link
         
-        #Now, download all chapter pages and store in app 'chapter_cache' folder
+    #     #Now, download all chapter pages and store in app 'chapter_cache' folder
         
-        host_link=pg_links['1'].split('/')[2]
-        referer_link=manga_data['ch_list'][str(chapter_selected)]['ch_link']
+    #     host_link=pg_links['1'].split('/')[2]
+    #     referer_link=manga_data['ch_list'][str(chapter_selected)]['ch_link']
 
-        s = requests.Session()
+    #     s = requests.Session()
 
-        headers = {
-                    "user-agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)", 
-                    "accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,image/jpg,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.9", 
-                    "accept-encoding" : "gzip, deflate, br", 
-                    "accept-language" : "en-GB,en;q=0.9,en-US;q=0.8,de;q=0.7", 
-                    "cache-control"   : "no-cache", 
-                    "pragma" : "no-cache", 
-                    "upgrade-insecure-requests" : "1" ,
-                    "Host": host_link,#example: 'bu3.mkklcdnv6tempv3.com',#
-                    "referer": referer_link
-                    }
-        s.headers = headers
+    #     headers = {
+    #                 "user-agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)", 
+    #                 "accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,image/jpg,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.9", 
+    #                 "accept-encoding" : "gzip, deflate, br", 
+    #                 "accept-language" : "en-GB,en;q=0.9,en-US;q=0.8,de;q=0.7", 
+    #                 "cache-control"   : "no-cache", 
+    #                 "pragma" : "no-cache", 
+    #                 "upgrade-insecure-requests" : "1" ,
+    #                 "Host": host_link,#example: 'bu3.mkklcdnv6tempv3.com',#
+    #                 "referer": referer_link
+    #                 }
+    #     s.headers = headers
         
-        #here, try to get one image, if works, proceed, except (else) follow link to other server button, reconstruct session by changing host_link
-        try:
-            page_response=s.get(pg_links['1'], verify=True)
-            img = Image.open(io.BytesIO(page_response.content))
-        except:
-            server_num=['','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','mn']
-            for hostname in [host_link.split('.')[1], 'mncdnbuv1']:
-                for num in server_num:
-                    host_link='bu'+num+'.'+hostname+'.'+host_link.split('.')[2]
-                    pg_links['1']='https://'+host_link+'/'+'/'.join(pg_links['1'].split('/')[3:])
-                    headers = {
-                                "user-agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)", 
-                                "accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,image/jpg,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.9", 
-                                "accept-encoding" : "gzip, deflate, br", 
-                                "accept-language" : "en-GB,en;q=0.9,en-US;q=0.8,de;q=0.7", 
-                                "cache-control"   : "no-cache", 
-                                "pragma" : "no-cache", 
-                                "upgrade-insecure-requests" : "1" ,
-                                "Host": host_link,
-                                "referer": referer_link
-                                }
-                    s.headers = headers#redefined since host_link got updated
+    #     #here, try to get one image, if works, proceed, except (else) follow link to other server button, reconstruct session by changing host_link
+    #     try:
+    #         page_response=s.get(pg_links['1'], verify=True)
+    #         img = Image.open(io.BytesIO(page_response.content))
+    #     except:
+    #         server_num=['','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','mn']
+    #         for hostname in [host_link.split('.')[1], 'mncdnbuv1']:
+    #             for num in server_num:
+    #                 host_link='bu'+num+'.'+hostname+'.'+host_link.split('.')[2]
+    #                 pg_links['1']='https://'+host_link+'/'+'/'.join(pg_links['1'].split('/')[3:])
+    #                 headers = {
+    #                             "user-agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)", 
+    #                             "accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,image/jpg,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.9", 
+    #                             "accept-encoding" : "gzip, deflate, br", 
+    #                             "accept-language" : "en-GB,en;q=0.9,en-US;q=0.8,de;q=0.7", 
+    #                             "cache-control"   : "no-cache", 
+    #                             "pragma" : "no-cache", 
+    #                             "upgrade-insecure-requests" : "1" ,
+    #                             "Host": host_link,
+    #                             "referer": referer_link
+    #                             }
+    #                 s.headers = headers#redefined since host_link got updated
                     
-                    try:
-                        page_response=s.get(pg_links['1'], verify=True)
-                        img = Image.open(io.BytesIO(page_response.content))
-                        break
-                    except:
-                        pass
+    #                 try:
+    #                     page_response=s.get(pg_links['1'], verify=True)
+    #                     img = Image.open(io.BytesIO(page_response.content))
+    #                     break
+    #                 except:
+    #                     pass
                 
-        #fix pg_links
-        for pg_no in pg_links:
-            pg_links[pg_no]='https://'+host_link+'/'+'/'.join(pg_links[pg_no].split('/')[3:])
+    #     #fix pg_links
+    #     for pg_no in pg_links:
+    #         pg_links[pg_no]='https://'+host_link+'/'+'/'.join(pg_links[pg_no].split('/')[3:])
             
-        reader_src.clear()
+    #     reader_src.clear()
         
-        for pg_no in pg_links:
-            page_response=s.get(pg_links[pg_no], verify=True)
-            try:
-                img = Image.open(io.BytesIO(page_response.content))
-            except:
-                img=Image.open('static/images/pgunavail.jpg', mode='r') 
+    #     for pg_no in pg_links:
+    #         page_response=s.get(pg_links[pg_no], verify=True)
+    #         try:
+    #             img = Image.open(io.BytesIO(page_response.content))
+    #         except:
+    #             img=Image.open('static/images/pgunavail.jpg', mode='r') 
             
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
-            img.save('static/chapter_cache/'+str(chapter_selected)+'-'+"{:03d}".format(int(pg_no))+'.jpg')
-            # generate link to page for reader webpage
-            reader_src[pg_no]='chapter_cache/'+str(chapter_selected)+'-'+"{:03d}".format(int(pg_no))+'.jpg'
+    #         if img.mode != 'RGB':
+    #             img = img.convert('RGB')
+    #         img.save('static/chapter_cache/'+str(chapter_selected)+'-'+"{:03d}".format(int(pg_no))+'.jpg')
+    #         # generate link to page for reader webpage
+    #         reader_src[pg_no]='chapter_cache/'+str(chapter_selected)+'-'+"{:03d}".format(int(pg_no))+'.jpg'
 
         
-    #link for manga title page
-    manga_home_link='/manga_result/choice/'+user_selections['manga']
+    # #link for manga title page
+    # manga_home_link='/manga_result/choice/'+user_selections['manga']
     
-    #we need key of next chap and previous chap
-    ch_all=list(manga_data['ch_list'].keys()) #list of keys
-    this_ch_index=ch_all.index(ch_no)         #index of this chapter in list
+    # #we need key of next chap and previous chap
+    # ch_all=list(manga_data['ch_list'].keys()) #list of keys
+    # this_ch_index=ch_all.index(ch_no)         #index of this chapter in list
     
-    #construct links for next and previous chapter
-    if this_ch_index > 0: #this is not the first in the list [most recent release]
-        next_ch_key=ch_all[this_ch_index-1]       #key of next chapter is this_ch_index - 1, since descending order
-        next_ch_link='/manga_reader/ch/'+next_ch_key+'/p1'
-    else:
-        next_ch_link=manga_home_link
+    # #construct links for next and previous chapter
+    # if this_ch_index > 0: #this is not the first in the list [most recent release]
+    #     next_ch_key=ch_all[this_ch_index-1]       #key of next chapter is this_ch_index - 1, since descending order
+    #     next_ch_link='/manga_reader/ch/'+next_ch_key+'/p1'
+    # else:
+    #     next_ch_link=manga_home_link
         
-    if this_ch_index < len(ch_all)-1: #final index of the list [first or oldest chapter]
-        prev_ch_key=ch_all[this_ch_index+1]       #similar for previous chapter
-        prev_ch_link='/manga_reader/ch/'+prev_ch_key+'/p1'
-    else:
-        prev_ch_link=manga_home_link
+    # if this_ch_index < len(ch_all)-1: #final index of the list [first or oldest chapter]
+    #     prev_ch_key=ch_all[this_ch_index+1]       #similar for previous chapter
+    #     prev_ch_link='/manga_reader/ch/'+prev_ch_key+'/p1'
+    # else:
+    #     prev_ch_link=manga_home_link
     
-    while True: #keep looping unless returning is possible
-        try:
-            return flask.render_template('mangareader3.html', ch_no=ch_no, p_no=int(p_no), pg_last=len(reader_src), pg_src=reader_src[str(p_no)], next_ch_link=next_ch_link, prev_ch_link=prev_ch_link, manga_home_link=manga_home_link)
-        except:
-            #wait if not done downloading all images
-            time.sleep(3)
+    # while True: #keep looping unless returning is possible
+    #     try:
+    #         return flask.render_template('mangareader3.html', ch_no=ch_no, p_no=int(p_no), pg_last=len(reader_src), pg_src=reader_src[str(p_no)], next_ch_link=next_ch_link, prev_ch_link=prev_ch_link, manga_home_link=manga_home_link)
+    #     except:
+    #         #wait if not done downloading all images
+    #         time.sleep(3)
 
 @app.route("/add2fav")
 def FavAdd():    
