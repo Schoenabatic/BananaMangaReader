@@ -5,20 +5,20 @@ Created on Sun Apr 17 12:40:26 2022
 Original author: buxared
 Fork and modifications: Schoenabatic
 
-AtomMangaReader, also referred to as AMR, is an application designed
+Atom Manga Reader, also referred to as AMR, is an application designed
 to read manga on Kobo eReaders.
 
 Copyright (C) 2022 buxared
 Copyright (C) 2025 Schoenabatic
 
-This file is part of AtomMangaReader.
+This file is part of Atom Manga Reader.
 
-AtomMangaReader is free software: you can redistribute it and/or modify
+Atom Manga Reader is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AtomMangaReader is distributed in the hope that it will be useful,
+Atom Manga Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.

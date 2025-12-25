@@ -2,7 +2,7 @@
 
 #Set up AMR server
 menu_item :main    :Start AMR server   :cmd_spawn          :quiet:sh /mnt/onboard/.AMR/AMRrun.sh
-    chain_success                      :dbg_msg            :AtomMangaReader server started and should be up and running in 3 seconds. Click 'Open AMR' from nickel menu or go to http://atom:1234/
+    chain_success                      :dbg_msg            :Atom Manga Reader server started and should be up and running in 3 seconds. Click 'Open AMR' from nickel menu or go to http://atom:1234/
 #Open AMR
 menu_item :main    :Open AMR           :nickel_browser     :modal:http://atom:1234/
 

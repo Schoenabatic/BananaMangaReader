@@ -1,14 +1,14 @@
-# AtomMangaReader
+# Atom Manga Reader
 
-**AtomMangaReader**, also referred to as **AMR**, is an application designed to read manga on Kobo eReaders.  
+**Atom Manga Reader**, also referred to as **AMR**, is an application designed to read manga on Kobo eReaders.  
 It is a lightweight, Kobo-first manga reader focused on simplicity, performance, and minimal user interface, built to work within the constraints of Kobo devices and their built-in browser.
 
-AtomMangaReader is a fork of **Banana Manga Reader** and has since diverged in design and implementation.  
+Atom Manga Reader is a fork of **Banana Manga Reader** and has since diverged in design and implementation.  
 It is maintained independently and prioritises modern, reliable sources and a cleaner reading experience.
 
 The application is designed to be easy to install and use, with minimal configuration required. While customization is possible by editing the HTML and Python code, the default setup aims to provide a complete, distraction-free manga reading experience out of the box.
 
-AtomMangaReader focuses on **reading manga you already know about**, rather than discovery. As a result, search functionality is intentionally simple.
+Atom Manga Reader focuses on **reading manga you already know about**, rather than discovery. As a result, search functionality is intentionally simple.
 
 ---
 
