@@ -7,90 +7,39 @@
       type="text/css"
       href="{{ url_for('static', filename='style/navstyle2.css') }}"
     />
-
-    <style>
-      body {
-        font-family: Georgia, Garamond, Serif;
-        background: #f7f7f7;
-        color: #000;
-      }
-
-      .search-container {
-        max-width: 420px;
-        margin: 60px auto;
-        background: #ffffff;
-        border: 2px solid #ccc;
-        border-radius: 16px;
-        padding: 24px;
-        text-align: center;
-      }
-
-      .search-title {
-        font-size: 22px;
-        font-weight: bold;
-        margin-bottom: 18px;
-      }
-
-      input[type="search"] {
-        width: 100%;
-        font-size: 18px;
-        padding: 10px;
-        border: 2px solid #999;
-        border-radius: 10px;
-        margin-bottom: 16px;
-      }
-
-      input[type="submit"] {
-        width: 100%;
-        font-size: 18px;
-        padding: 10px;
-        border: 2px solid #000;
-        background: #000;
-        color: #fff;
-        border-radius: 10px;
-      }
-
-      input[type="submit"]:active {
-        background: #333;
-      }
-
-      .hint {
-        margin-top: 18px;
-        font-size: 14px;
-        line-height: 1.4;
-        color: #333;
-      }
-    </style>
   </head>
-
   <body>
-    <!-- Hamburger menu (unchanged) -->
-    <div class="hamburger-menu">
-      <input id="menu__toggle" type="checkbox" />
-      <label class="menu__btn" for="menu__toggle"><span></span></label>
-      <ul class="menu__box">
-        <li><a class="menu__item" href="/">Home</a></li>
-        <li><a class="menu__item" href="/search">Search Manga</a></li>
-        <li><a class="menu__item" href="/favorites">Favorites</a></li>
-        <li><a class="menu__item" href="/library">Library</a></li>
-        <li><a class="menu__item" href="/nav">Navigation</a></li>
-        <li><a class="menu__item" href="/about">About</a></li>
-        <li><a class="menu__item" href="/shutdown">Close app</a></li>
-      </ul>
-    </div>
+    <nav class="navbar">
+      <img
+        src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+        alt="Logo"
+        class="nav-logo"
+      />
+      <a href="/" class="nav-item">Home</a>
+      <a href="/search" class="nav-item active">Search</a>
+      <a href="/favorites" class="nav-item">Favorites</a>
+      <a href="/library" class="nav-item">Library</a>
+      <a href="/nav" class="nav-item">Help</a>
+      <a href="/about" class="nav-item">About</a>
+      <a href="/shutdown" class="nav-item">Exit</a>
+    </nav>
 
-    <div class="search-container">
-      <div class="search-title">Search Manga</div>
-
-      <form action="/results/srchstr" method="POST" id="searchForm">
-        <input type="search" name="srchstr" placeholder="e.g. demon slayer" />
-        <input type="submit" value="Search" />
-      </form>
-
-      <div class="hint">
-        Make it a good search.<br />
-        You will get a maximum of 20 results.<br />
-        <em>I know… it’s bananas!</em>
+    <div class="container">
+      <div class="card center-text">
+        <h2>Search Manga</h2>
+        <form action="/results/srchstr" method="POST" id="searchForm">
+          <input
+            type="search"
+            name="srchstr"
+            placeholder="e.g. Demon Slayer"
+            autofocus
+          />
+          <input type="submit" value="Search" />
+        </form>
+        <div class="hint">
+          Enter a title to search on WeebCentral.<br />
+          Results are limited to the top 20 matches.
+        </div>
       </div>
     </div>
   </body>

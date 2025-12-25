@@ -2,186 +2,88 @@
 <html>
   <head>
     <title>AtomMangaReader: Manga Home</title>
-
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='style/navstyle2.css') }}"
     />
-
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: #ececec;
-        font-family: Georgia, Garamond, Serif;
-      }
-
-      img {
-        width: 100%;
-        height: auto;
-        border-radius: 10px;
-      }
-
-      /* CENTERED CARD */
-      .page-wrapper {
-        display: flex;
-        justify-content: center;
-        padding: 28px 0;
-      }
-
-      .manga-card {
-        width: 100%;
-        max-width: 1150px;
-        background: #ffffff;
-        border-radius: 18px;
-        border: 1px solid #d0d0d0;
-        padding: 20px;
-      }
-
-      .manga-page {
-        display: flex;
-        gap: 20px;
-      }
-
-      /* LEFT COLUMN */
-      .manga-left {
-        width: 38%;
-      }
-
-      .manga-left h1 {
-        margin-top: 0;
-        font-size: 26px;
-      }
-
-      .manga-cover {
-        max-width: 260px;
-        margin: 12px 0 16px 0;
-      }
-
-      .meta {
-        font-size: 15px;
-        color: #333;
-      }
-
-      /* RIGHT COLUMN */
-      .manga-right {
-        width: 62%;
-        border-left: 1px solid #e0e0e0;
-        padding-left: 16px;
-      }
-
-      .manga-right h3 {
-        margin-top: 0;
-      }
-
-      /* CHAPTER LIST */
-      .chapter-list {
-        border: 1px solid #ddd;
-        border-radius: 12px;
-        overflow: hidden;
-      }
-
-      .chapter-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 12px;
-        border-bottom: 1px solid #e6e6e6;
-        background: #fafafa;
-      }
-
-      .chapter-row:nth-child(even) {
-        background: #f5f5f5;
-      }
-
-      .chapter-row:last-child {
-        border-bottom: none;
-      }
-
-      .chapter-row a {
-        text-decoration: none;
-        color: #111;
-        font-weight: bold;
-      }
-
-      .chapter-row a:hover {
-        text-decoration: underline;
-      }
-
-      .chapter-date {
-        font-size: 14px;
-        color: #666;
-        white-space: nowrap;
-      }
-
-      a {
-        color: #000;
-      }
-    </style>
   </head>
-
   <body>
-    <div class="hamburger-menu">
-      <input id="menu__toggle" type="checkbox" />
-      <label class="menu__btn" for="menu__toggle">
-        <span></span>
-      </label>
+    <nav class="navbar">
+      <img
+        src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+        alt="Logo"
+        class="nav-logo"
+      />
+      <a href="/" class="nav-item">Home</a>
+      <a href="/search" class="nav-item">Search</a>
+      <a href="/favorites" class="nav-item">Favorites</a>
+      <a href="/library" class="nav-item">Library</a>
+      <a href="/nav" class="nav-item">Help</a>
+      <a href="/about" class="nav-item">About</a>
+      <a href="/shutdown" class="nav-item">Exit</a>
+    </nav>
 
-      <ul class="menu__box">
-        <li><a class="menu__item" href="/">Home</a></li>
-        <li><a class="menu__item" href="/search">Search Manga</a></li>
-        <li><a class="menu__item" href="/favorites">Favorites</a></li>
-        <li><a class="menu__item" href="/add2fav">Add to favorites</a></li>
-        <li><a class="menu__item" href="/library">Library</a></li>
-        <li><a class="menu__item" href="/nav">Navigation</a></li>
-        <li><a class="menu__item" href="/about">About</a></li>
-        <li><a class="menu__item" href="/shutdown">Close app</a></li>
-      </ul>
-    </div>
-
-    <div class="page-wrapper">
-      <div class="manga-card">
-        <div class="manga-page">
-          <!-- LEFT -->
-          <div class="manga-left">
-            <h1>{{ manga_data['title'] }}</h1>
-
-            <div class="meta">
-              Author: {{ manga_data['author'] }}<br />
-              Last update: {{ manga_data['update'] }}<br />
-              Genres: {% for genre in manga_data['genres'] %} {{ genre }}{% if
-              not loop.last %}, {% endif %} {% endfor %}
-            </div>
-
+    <div class="container">
+      <div class="card">
+        <div class="manga-header">
+          <!-- Left: Cover Image -->
+          <div class="manga-cover-container">
             <img
               class="manga-cover"
               src="{{ url_for('static', filename='manga_cover/manga_cover.jpg') }}"
+              alt="Cover"
             />
-
-            <h3>Description</h3>
-            <p>
-              {{ manga_data['description'] }} …
-              <a href="{{ manga_data['url'] }}">Read more</a>
-            </p>
           </div>
 
-          <!-- RIGHT -->
-          <div class="manga-right">
-            <h3>Chapters</h3>
+          <!-- Right: Info & Actions -->
+          <div class="manga-info">
+            <h2>{{ manga_data['title'] }}</h2>
+            <div class="meta-info">
+              <p><strong>Author:</strong> {{ manga_data['author'] }}</p>
+              <p>
+                <strong>Genres:</strong>
+                {% for genre in manga_data['genres'] %} {{ genre }}{% if not
+                loop.last %}, {% endif %} {% endfor %}
+              </p>
+              <p><strong>Updated:</strong> {{ manga_data['update'] }}</p>
+            </div>
 
-            <div class="chapter-list">
-              {% for key in manga_data['ch_list'] %}
-              <div class="chapter-row" data-chapter="{{ key }}">
-                <a href="{{ manga_data['ch_list'][key]['ch_url'] }}">
-                  {{ manga_data['ch_list'][key]['ch_title'] }}
-                </a>
-                <span class="chapter-date">
-                  {{ manga_data['ch_list'][key]['ch_update'] }}
-                </span>
-              </div>
-              {% endfor %}
+            <div class="description-box">
+              <p>{{ manga_data['description'] }}</p>
+              <a
+                href="{{ manga_data['url'] }}"
+                target="_blank"
+                class="external-link"
+                >Read more on Source &rarr;</a
+              >
+            </div>
+
+            <div
+              class="action-grid"
+              style="grid-template-columns: 1fr 1fr; margin-top: 1rem"
+            >
+              <a href="/add2fav" class="btn">Add to Favorites</a>
+              <a href="/add2lib" class="btn btn-secondary">Add to Library</a>
             </div>
           </div>
+        </div>
+
+        <h3>Chapters</h3>
+        <div class="chapter-list">
+          {% for key in manga_data['ch_list'] %}
+          <a
+            href="{{ manga_data['ch_list'][key]['ch_url'] }}"
+            class="chapter-item"
+          >
+            <span style="font-weight: bold"
+              >{{ manga_data['ch_list'][key]['ch_title'] }}</span
+            >
+            <span class="chapter-date"
+              >{{ manga_data['ch_list'][key]['ch_update'] }}</span
+            >
+          </a>
+          {% endfor %}
         </div>
       </div>
     </div>

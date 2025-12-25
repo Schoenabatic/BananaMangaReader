@@ -1,61 +1,67 @@
 <!DOCTYPE html>
 <!--
-
-AtomMangaReader, also referred to as AMR, is a software designed 
-to read manga on Kobo eReaders.
-
-Copyright (C) 2022  buxared
-
-This file is a part of AtomMangaReader.
-
-AtomMangaReader is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-AtomMangaReader is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>
-
+AtomMangaReader (AMR)
+Copyright (C) 2022 buxared
+License: GPLv3
 -->
 <html>
   <head>
     <title>AtomMangaReader</title>
     <link rel="stylesheet" type="text/css" href="{{url_for("static",
     filename="style/navstyle2.css")}}">
-    <style>
-      body {
-        background-image: url({{url_for(
-            "static",
-            filename= "images/AMR_logo.svg"
-          )}});
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-        background-size: contain;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    <div class="hamburger-menu">
-      <input id="menu__toggle" type="checkbox" />
-      <label class="menu__btn" for="menu__toggle">
-        <span></span>
-      </label>
+    <nav class="navbar">
+      <img
+        src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+        alt="Logo"
+        class="nav-logo"
+      />
+      <a href="/" class="nav-item active">Home</a>
+      <a href="/search" class="nav-item">Search</a>
+      <a href="/favorites" class="nav-item">Favorites</a>
+      <a href="/library" class="nav-item">Library</a>
+      <a href="/nav" class="nav-item">Help</a>
+      <a href="/about" class="nav-item">About</a>
+      <a href="/shutdown" class="nav-item">Exit</a>
+    </nav>
 
-      <ul class="menu__box">
-        <li><a class="menu__item" href="/">Home</a></li>
-        <li><a class="menu__item" href="/search">Search Manga</a></li>
-        <li><a class="menu__item" href="/favorites">Favorites</a></li>
-        <li><a class="menu__item" href="/library">Library</a></li>
-        <li><a class="menu__item" href="/nav">Navigation</a></li>
-        <li><a class="menu__item" href="/about">About</a></li>
-        <li><a class="menu__item" href="/shutdown">Close app</a></li>
-      </ul>
+    <div class="container">
+      <div class="center-text" style="margin-bottom: 40px">
+        <img src="{{url_for("static", filename="images/AMR_logo.svg")}}"
+        alt="AMR Logo" style="max-width: 150px; margin-bottom: 20px;">
+        <h1>AtomMangaReader</h1>
+        <p>The ultimate manga reading experience for your Kobo.</p>
+      </div>
+
+      <div class="action-grid">
+        <a href="/search" class="action-card">
+          <div class="card-icon">🔍</div>
+          <div class="card-title">Search Manga</div>
+          <div class="card-desc">Discover new series from WeebCentral.</div>
+        </a>
+
+        <a href="/library" class="action-card">
+          <div class="card-icon">📚</div>
+          <div class="card-title">My Library</div>
+          <div class="card-desc">Access your downloaded chapters offline.</div>
+        </a>
+
+        <a href="/favorites" class="action-card">
+          <div class="card-icon">⭐</div>
+          <div class="card-title">Favorites</div>
+          <div class="card-desc">
+            Quickly jump back into your favorite series.
+          </div>
+        </a>
+      </div>
+
+      <div class="footer">
+        <a href="/nav">Navigation Guide</a>
+        <a href="/about">About AMR</a>
+        <a href="/shutdown">Close Application</a>
+      </div>
     </div>
   </body>
 </html>

@@ -2,184 +2,78 @@
 <html>
   <head>
     <title>AtomMangaReader: Search Results</title>
-
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='style/navstyle2.css') }}"
     />
-
-    <style>
-      /* Global box model fix */
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: Georgia, Garamond, Serif;
-        background: #f7f7f7;
-        color: #000;
-        margin: 0;
-        padding: 0;
-      }
-
-      h3 {
-        margin: 12px;
-      }
-
-      /* ================= SEARCH CARD ================= */
-
-      .search-card {
-        max-width: 420px;
-        margin: 60px auto 30px auto;
-        background: #ffffff;
-        border: 1.5px solid #bbb;
-        border-radius: 18px;
-        padding: 26px;
-        text-align: center;
-      }
-
-      .search-title {
-        font-size: 22px;
-        font-weight: bold;
-        margin-bottom: 20px;
-      }
-
-      .search-card input[type="text"] {
-        width: 100%;
-        height: 44px;
-        font-size: 18px;
-        padding: 10px 12px;
-        border: 2px solid #999;
-        border-radius: 12px;
-        margin-bottom: 18px;
-      }
-
-      .search-card input[type="text"]::placeholder {
-        color: #666;
-      }
-
-      .search-card input[type="submit"] {
-        width: 100%;
-        font-size: 18px;
-        padding: 12px;
-        border: 2px solid #111;
-        background: #111;
-        color: #fff;
-        border-radius: 12px;
-      }
-
-      .search-card input[type="submit"]:active {
-        background: #333;
-      }
-
-      /* ================= RESULTS GRID ================= */
-
-      .results-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 14px;
-        padding: 12px;
-      }
-
-      /* ================= MANGA CARD ================= */
-
-      .manga-card {
-        display: flex;
-        background: #ffffff;
-        border: 2px solid #ccc;
-        border-radius: 14px;
-        padding: 10px;
-        text-decoration: none;
-        color: inherit;
-      }
-
-      .manga-card:active {
-        background: #eaeaea;
-      }
-
-      .manga-cover {
-        width: 120px;
-        height: auto;
-        border-radius: 8px;
-        margin-right: 12px;
-        flex-shrink: 0;
-      }
-
-      .manga-info {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .manga-title {
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 6px;
-        line-height: 1.2;
-      }
-
-      .manga-meta {
-        font-size: 15px;
-        line-height: 1.4;
-      }
-
-      .label {
-        font-weight: bold;
-      }
-    </style>
   </head>
-
   <body>
-    <!-- Hamburger menu -->
-    <div class="hamburger-menu">
-      <input id="menu__toggle" type="checkbox" />
-      <label class="menu__btn" for="menu__toggle"><span></span></label>
-      <ul class="menu__box">
-        <li><a class="menu__item" href="/">Home</a></li>
-        <li><a class="menu__item" href="/search">Search Manga</a></li>
-        <li><a class="menu__item" href="/favorites">Favorites</a></li>
-        <li><a class="menu__item" href="/library">Library</a></li>
-        <li><a class="menu__item" href="/nav">Navigation</a></li>
-        <li><a class="menu__item" href="/about">About</a></li>
-        <li><a class="menu__item" href="/shutdown">Close app</a></li>
-      </ul>
-    </div>
+    <nav class="navbar">
+      <img
+        src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+        alt="Logo"
+        class="nav-logo"
+      />
+      <a href="/" class="nav-item">Home</a>
+      <a href="/search" class="nav-item active">Search</a>
+      <a href="/favorites" class="nav-item">Favorites</a>
+      <a href="/library" class="nav-item">Library</a>
+      <a href="/nav" class="nav-item">Help</a>
+      <a href="/about" class="nav-item">About</a>
+      <a href="/shutdown" class="nav-item">Exit</a>
+    </nav>
 
-    <!-- Search -->
-    <div class="search-card">
-      <div class="search-title">Search Manga</div>
-      <form action="#" method="POST" id="searchForm">
-        <input type="text" name="srchstr" placeholder="e.g. demon slayer" />
-        <input type="submit" value="Search" />
-      </form>
-    </div>
+    <div class="container">
+      <div class="card center-text">
+        <h3>Search Again</h3>
+        <form action="/results/srchstr" method="POST">
+          <input type="text" name="srchstr" placeholder="Search..." />
+          <input type="submit" value="Search" />
+        </form>
+      </div>
 
-    <h3>Results</h3>
+      <h3>Results ({{ n_manga }})</h3>
 
-    <!-- Results -->
-    <div class="results-grid">
-      {% if n_manga > 0 %} {% for key in res %}
-      <a class="manga-card" href="/manga_result/choice/{{ key }}">
-        {% if res[key].get('img') %}
-        <img class="manga-cover" src="{{ res[key]['img'] }}" />
-        {% else %}
-        <div class="manga-cover">No image</div>
-        {% endif %}
-
-        <div class="manga-info">
-          <div class="manga-title">{{ res[key]['title'] }}</div>
-          <div class="manga-meta">
-            <span class="label">Author:</span>
-            {{ res[key].get('author', 'Unknown') }}<br />
-            <span class="label">Latest Chapter:</span>
-            {{ res[key].get('last_ch', '—') }}
+      <div class="action-grid">
+        {% if n_manga > 0 %} {% for key in res %}
+        <a
+          href="/manga_result/choice/{{ key }}"
+          class="action-card"
+          style="
+            padding: 15px;
+            align-items: flex-start;
+            text-align: left;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 15px;
+          "
+        >
+          {% if res[key].get('img') %}
+          <img
+            src="{{ res[key]['img'] }}"
+            style="
+              width: 80px;
+              height: auto;
+              border-radius: 4px;
+              border: 1px solid #000;
+            "
+          />
+          {% endif %}
+          <div>
+            <div class="card-title" style="font-size: 1.1rem">
+              {{ res[key]['title'] }}
+            </div>
+            <div class="card-desc" style="text-align: left; margin-top: 5px">
+              <span style="font-weight: bold">Author:</span> {{
+              res[key].get('author', 'Unknown') }}<br />
+              <span style="font-weight: bold">Latest:</span> {{
+              res[key].get('last_ch', '—') }}
+            </div>
           </div>
-        </div>
-      </a>
-      {% endfor %} {% endif %}
+        </a>
+        {% endfor %} {% endif %}
+      </div>
     </div>
   </body>
 </html>

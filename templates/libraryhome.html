@@ -1,77 +1,78 @@
 <!DOCTYPE html>
-<!--
-
-AtomMangaReader, also referred to as AMR, is a software designed 
-to read manga on Kobo eReaders.
-
-Copyright (C) 2022  buxared
-
-This file is a part of AtomMangaReader.
-
-AtomMangaReader is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-AtomMangaReader is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>
-
--->
 <html>
   <head>
     <title>AtomMangaReader: Library</title>
-    <link rel="stylesheet" type="text/css" href="{{url_for("static",
-    filename="style/navstyle2.css")}}">
-    <style></style>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style/navstyle2.css') }}"
+    />
   </head>
   <body>
-    <div class="hamburger-menu">
-      <input id="menu__toggle" type="checkbox" />
-      <label class="menu__btn" for="menu__toggle">
-        <span></span>
-      </label>
+    <nav class="navbar">
+      <img
+        src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+        alt="Logo"
+        class="nav-logo"
+      />
+      <a href="/" class="nav-item">Home</a>
+      <a href="/search" class="nav-item">Search</a>
+      <a href="/favorites" class="nav-item">Favorites</a>
+      <a href="/library" class="nav-item active">Library</a>
+      <a href="/nav" class="nav-item">Help</a>
+      <a href="/about" class="nav-item">About</a>
+      <a href="/shutdown" class="nav-item">Exit</a>
+    </nav>
 
-      <ul class="menu__box">
-        <li><a class="menu__item" href="/">Home</a></li>
-        <li><a class="menu__item" href="/search">Search Manga</a></li>
-        <li><a class="menu__item" href="/favorites">Favorites</a></li>
-        <li><a class="menu__item" href="/library">Library</a></li>
-        <li><a class="menu__item" href="/nav">Navigation</a></li>
-        <li><a class="menu__item" href="/about">About</a></li>
-        <li><a class="menu__item" href="/shutdown">Close app</a></li>
-      </ul>
-    </div>
-
-    <h1>Library</h1>
-    <div
-      style="
-        height: auto;
-        width: 100%;
-        border: 1px solid #ccc;
-        font: 16px/26px Georgia, Garamond, Serif;
-      "
-    >
-      <table border="1" style="width: 100%">
-        <th>No.</th>
-        <th>Title</th>
-        <th>Action</th>
-        {%if n_titles>0: %} {% for n in range(n_titles): %}
-        <tr>
-          <td style="width: 10%">{{n+1}}</td>
-          <td><a href="/library/{{title_list[n]}}">{{title_list[n]}}</a></td>
-          <td style="width: 15%">
-            <form action="/libTitleRemoval/{{title_list[n]}}">
-              <button type="submit">Remove</button>
+    <div class="container">
+      <div class="card">
+        <h2>Library</h2>
+        {% if n_titles > 0 %}
+        <div class="action-grid" style="grid-template-columns: 1fr">
+          {% for n in range(n_titles) %}
+          <div
+            class="card"
+            style="
+              border: 1px solid black;
+              padding: 1rem;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 1rem">
+              <span style="font-weight: bold; font-size: 1.2rem"
+                >{{ n+1 }}.</span
+              >
+              <a
+                href="/library/{{title_list[n]}}"
+                style="
+                  font-weight: bold;
+                  font-size: 1.2rem;
+                  text-decoration: none;
+                  color: black;
+                "
+              >
+                {{ title_list[n] }}
+              </a>
+            </div>
+            <form action="/libTitleRemoval/{{title_list[n]}}" style="margin: 0">
+              <button
+                type="submit"
+                class="btn btn-secondary"
+                style="padding: 0.5rem 1rem; font-size: 1rem"
+              >
+                Remove
+              </button>
             </form>
-          </td>
-        </tr>
-        {% endfor %} {%endif%}
-      </table>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>Library is empty.</p>
+        <a href="/search" class="btn">Search for Manga to Download</a>
+        {% endif %}
+      </div>
     </div>
   </body>
 </html>

@@ -1,92 +1,186 @@
 <!DOCTYPE html>
-<!--
-
-AtomMangaReader, also referred to as AMR, is a software designed 
-to read manga on Kobo eReaders.
-
-Copyright (C) 2022  buxared
-
-This file is a part of AtomMangaReader.
-
-AtomMangaReader is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-AtomMangaReader is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>
-
--->
 <html>
-<head>
-<title>Banana Manga Reader: Lib. Ch: {{ch_no}} Pg: {{p_no}}/{{pg_last}}</title>
-<style>
-.menu_list {
-    display: block;
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 36px;
-    font-weight: 600;
-    text-decoration: none;
-}
-td {
-    text-align: center;
-    width: 100%;
-    position: absolute;
-}
-</style>
-</head>
-<body style="margin: 0; padding: 0; zoom: 60%;">
+  <head>
+    <title>AtomMangaReader: Lib. Ch: {{ch_no}} Pg: {{p_no}}/{{pg_last}}</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style/navstyle2.css') }}"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #ffffff;
+        overflow-x: hidden;
+      }
 
-<img src="{{url_for("static", filename=pg_src)}}" style="display: block; margin-left: auto; margin-right: auto; min-height: 100vh; width: auto;">
+      .reader-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        width: 100%;
+      }
 
-{% if p_no+1 <= pg_last: %}
-<a href="/offline_reader/ch/{{ch_no}}/p{{p_no+1}}">
-{% else: %}
-<a href="/offline_reader/ch/{{ch_no}}/p{{p_no}}">
-{% endif %}
-<div style="position: fixed; left: 0%; top: 0%; width: 25%; height: 100vh; background-color: transparent;"></div>
-</a>
+      .manga-image {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        min-height: 100vh;
+        object-fit: contain;
+      }
 
-{% if p_no-1 >= 1: %}
-<a href="/offline_reader/ch/{{ch_no}}/p{{p_no-1}}">
-{% else: %}
-<a href="/offline_reader/ch/{{ch_no}}/p1">
-{% endif %}
-<div style="position: fixed; left: 75%; top: 0%; width: 25%; height: 100vh; background-color: transparent;"></div>
-</a>
+      /* Touch Zones */
+      .touch-zone {
+        position: fixed;
+        top: 0;
+        height: 100vh;
+        z-index: 50;
+      }
+      .zone-left {
+        left: 0;
+        width: 30%;
+      }
+      .zone-right {
+        right: 0;
+        width: 30%;
+      }
+      .zone-center {
+        left: 30%;
+        width: 40%;
+        cursor: pointer;
+      }
 
-<div onclick="ShowMenu()" style="position: fixed; left: 35%; top: 35%; width: 30vh; height: 30vh; background-color: transparent;"></div>
-<div id="myDropdown" style="display: none; position: fixed; left: 25%;  top: 1vh; width: 50vw; min-height: 99vh; background-color: #ECEFF1;">
-    <Table style="width: 100%; height: 100%;">
-        <tr style="height: 9vh;"><td><button type="button" onclick="ShowMenu()" class="menu_list">Close Menu</button></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href={{next_ch_link}}>>> Chapter >></a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href={{prev_ch_link}}><< Chapter <<</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href={{manga_home_link}}>Manga Home</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href="/">Home</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href="/search">Search Manga</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href="/favorites">Favorites</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href="/library">Library</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href="/nav">Navigation</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href="/about">About</a></td></tr>
-        <tr style="height: 9vh;"><td><a class="menu_list" href="/shutdown">Close app</a></td></tr>
-    </Table>
-</div>
-</body>
+      /* Reader Menu Overlay */
+      .reader-menu {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 400px;
+        background: white;
+        border: 2px solid black;
+        padding: 20px;
+        z-index: 1000;
+        box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
+      }
 
-<script>
-function ShowMenu() {
-  var x = document.getElementById("myDropdown");
-  if (x.style.display === "block") {
-    x.style.display = "none";
-  } else {
-    x.style.display = "block";
-  }
-}
-</script>
+      .reader-menu h3 {
+        margin-top: 0;
+        text-align: center;
+        border-bottom: 2px solid black;
+        padding-bottom: 10px;
+      }
+
+      .reader-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .overlay-bg {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reader-container">
+      <img
+        class="manga-image"
+        src="{{ url_for('static', filename=pg_src) }}"
+        alt="Page {{ p_no }}"
+      />
+    </div>
+
+    <!-- Navigation Zones -->
+    <!-- Left Zone: Next Page (RTL assumption or user preference) -->
+    {% if p_no + 1 <= pg_last %}
+    <a
+      href="/offline_reader/ch/{{ch_no}}/p{{p_no+1}}"
+      class="touch-zone zone-left"
+    ></a>
+    {% else %}
+    <a
+      href="/offline_reader/ch/{{ch_no}}/p{{p_no}}"
+      class="touch-zone zone-left"
+    ></a>
+    {% endif %}
+
+    <!-- Right Zone: Prev Page -->
+    {% if p_no - 1 >= 1 %}
+    <a
+      href="/offline_reader/ch/{{ch_no}}/p{{p_no-1}}"
+      class="touch-zone zone-right"
+    ></a>
+    {% else %}
+    <a href="/offline_reader/ch/{{ch_no}}/p1" class="touch-zone zone-right"></a>
+    {% endif %}
+
+    <!-- Center Zone (Menu) -->
+    <div class="touch-zone zone-center" onclick="toggleMenu()"></div>
+
+    <!-- Menu Overlay -->
+    <div id="menuOverlay" class="overlay-bg" onclick="toggleMenu()"></div>
+    <div id="readerMenu" class="reader-menu">
+      <div style="text-align: center; margin-bottom: 10px">
+        <img
+          src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+          alt="AMR Logo"
+          style="width: 50px; height: auto"
+        />
+      </div>
+      <h3>Menu</h3>
+      <div class="reader-controls">
+        <div style="text-align: center; margin-bottom: 10px">
+          Page {{ p_no }} / {{ pg_last }}
+        </div>
+
+        <a href="{{ next_ch_link }}" class="btn">Next Chapter</a>
+        <a href="{{ prev_ch_link }}" class="btn btn-secondary"
+          >Previous Chapter</a
+        >
+        <a href="{{ manga_home_link }}" class="btn btn-secondary">Manga Info</a>
+        <a href="/" class="btn btn-secondary">Home</a>
+        <button class="btn btn-secondary" onclick="toggleMenu()">
+          Close Menu
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function toggleMenu() {
+          var menu = document.getElementById("readerMenu");
+          var bg = document.getElementById("menuOverlay");
+          var isVisible = menu.style.display === "block";
+
+          menu.style.display = isVisible ? "none" : "block";
+          bg.style.display = isVisible ? "none" : "block";
+      }
+
+      // Keyboard navigation
+      document.addEventListener("keydown", function(e) {
+          if (e.key === "ArrowLeft") {
+              {% if p_no + 1 <= pg_last %}
+              window.location.href = "/offline_reader/ch/{{ch_no}}/p{{p_no+1}}";
+              {% endif %}
+          } else if (e.key === "ArrowRight") {
+              {% if p_no - 1 >= 1 %}
+              window.location.href = "/offline_reader/ch/{{ch_no}}/p{{p_no-1}}";
+              {% endif %}
+          } else if (e.key === "Enter") {
+               toggleMenu();
+          }
+      });
+    </script>
+  </body>
 </html>

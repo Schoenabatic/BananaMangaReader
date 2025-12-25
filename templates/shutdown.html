@@ -1,62 +1,54 @@
 <!DOCTYPE html>
-<!--
-
-AtomMangaReader, also referred to as AMR, is a software designed 
-to read manga on Kobo eReaders.
-
-Copyright (C) 2022  buxared
-
-This file is a part of AtomMangaReader.
-
-AtomMangaReader is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-AtomMangaReader is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>
-
--->
 <html>
   <head>
     <title>AtomMangaReader: Shutdown</title>
-    <link rel="stylesheet" type="text/css" href="{{url_for("static",
-    filename="style/navstyle2.css")}}">
-    <style></style>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style/navstyle2.css') }}"
+    />
   </head>
   <body>
-    <div class="hamburger-menu">
-      <input id="menu__toggle" type="checkbox" />
-      <label class="menu__btn" for="menu__toggle">
-        <span></span>
-      </label>
+    <nav class="navbar">
+      <img
+        src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+        alt="Logo"
+        class="nav-logo"
+      />
+      <a href="/" class="nav-item">Home</a>
+      <a href="/search" class="nav-item">Search</a>
+      <a href="/favorites" class="nav-item">Favorites</a>
+      <a href="/library" class="nav-item">Library</a>
+      <a href="/nav" class="nav-item">Help</a>
+      <a href="/about" class="nav-item">About</a>
+      <a href="/shutdown" class="nav-item active">Exit</a>
+    </nav>
 
-      <ul class="menu__box">
-        <li><a class="menu__item" href="/">Home</a></li>
-        <li><a class="menu__item" href="/search">Search Manga</a></li>
-        <li><a class="menu__item" href="/favorites">Favorites</a></li>
-        <li><a class="menu__item" href="/library">Library</a></li>
-        <li><a class="menu__item" href="/nav">Navigation</a></li>
-        <li><a class="menu__item" href="/about">About</a></li>
-        <li><a class="menu__item" href="/shutdown">Close app</a></li>
-      </ul>
+    <div class="container">
+      <div class="card" style="text-align: center; padding: 3rem">
+        <img
+          src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+          alt="AMR Logo"
+          style="width: 80px; height: auto; margin-bottom: 20px"
+        />
+        <h1>Shut Down Server</h1>
+        <p>Press the button below to stop the application server.</p>
+        <form
+          action="#"
+          method="POST"
+          style="margin-top: 2rem; margin-bottom: 2rem"
+        >
+          <button
+            type="submit"
+            class="btn"
+            style="font-size: 1.5rem; padding: 1rem 2rem"
+          >
+            Shut Down
+          </button>
+        </form>
+        <p>After shutting down, close the browser to return to Kobo home.</p>
+        <h3>Come back again soon!</h3>
+      </div>
     </div>
-
-    <center>
-      <br /><br /><br />
-      <h1>Press button to shut down app server...</h1>
-      <form action="#" method="POST">
-        <button type="submit">Shut down</button>
-      </form>
-      <br />
-      <h2>Close browser (Press [X]) to return to Kobo home</h2>
-      <br /><br />
-      <h1>Come back again soon!</h1>
-    </center>
   </body>
 </html>

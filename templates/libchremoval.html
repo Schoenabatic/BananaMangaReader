@@ -27,34 +27,37 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>
     <title>AtomMangaReader: Library</title>
     <link rel="stylesheet" type="text/css" href="{{url_for("static",
     filename="style/navstyle2.css")}}">
-    <style></style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    <div class="hamburger-menu">
-      <input id="menu__toggle" type="checkbox" />
-      <label class="menu__btn" for="menu__toggle">
-        <span></span>
-      </label>
+    <nav class="navbar">
+      <img
+        src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+        alt="Logo"
+        class="nav-logo"
+      />
+      <a href="/" class="nav-item">Home</a>
+      <a href="/search" class="nav-item">Search</a>
+      <a href="/favorites" class="nav-item">Favorites</a>
+      <a href="/library" class="nav-item active">Library</a>
+      <a href="/nav" class="nav-item">Help</a>
+      <a href="/about" class="nav-item">About</a>
+      <a href="/shutdown" class="nav-item">Exit</a>
+    </nav>
 
-      <ul class="menu__box">
-        <li><a class="menu__item" href="/">Home</a></li>
-        <li><a class="menu__item" href="/search">Search Manga</a></li>
-        <li><a class="menu__item" href="/favorites">Favorites</a></li>
-        <li><a class="menu__item" href="/library">Library</a></li>
-        <li><a class="menu__item" href="/nav">Navigation</a></li>
-        <li><a class="menu__item" href="/about">About</a></li>
-        <li><a class="menu__item" href="/shutdown">Close app</a></li>
-      </ul>
+    <div class="container">
+      <h1>Removed Chapter from Library</h1>
+
+      <div class="description-box" style="text-align: center">
+        <p>
+          <strong>{{removed_ch}}</strong> has been removed from the title:
+          <strong>{{removed_title}}</strong>
+        </p>
+      </div>
+
+      <div style="margin-top: 20px; text-align: center">
+        <a href="/library" class="btn">Back to Library</a>
+      </div>
     </div>
-
-    <h1>Removed Chapter from Library</h1>
-    <br /><br /><br />
-    {{removed_ch}} has been removed from the title: {{removed_title}}<br />
-    <br /><br />
-    <center>
-      <form action="/library">
-        <button type="submit">Back to Library</button>
-      </form>
-    </center>
   </body>
 </html>
