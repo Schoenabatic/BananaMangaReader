@@ -13,7 +13,7 @@
       body {
         margin: 0;
         padding: 0;
-        background-color: #ffffff; /* E-Ink friendly white */
+        background-color: #ffffff;
         overflow-x: hidden;
       }
 
@@ -29,18 +29,15 @@
         display: block;
         max-width: 100%;
         height: auto;
-        /* Ensure image fits vertically if needed, or scrolls */
         min-height: 100vh;
         object-fit: contain;
       }
 
-      /* Touch Zones */
       .touch-zone {
         position: fixed;
         top: 0;
         height: 100vh;
         z-index: 50;
-        /* background: rgba(255, 0, 0, 0.1); Debugging */
       }
       .zone-left {
         left: 0;
@@ -56,7 +53,6 @@
         cursor: pointer;
       }
 
-      /* Reader Menu Overlay */
       .reader-menu {
         display: none;
         position: fixed;
@@ -101,58 +97,60 @@
       .overlay-bg {
         display: none;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background: rgba(255, 255, 255, 0.8);
         z-index: 999;
       }
     </style>
   </head>
+
   <body>
     <div class="reader-container">
       <img
         class="manga-image"
-        src="{{ reader_src[p_no-1] }}"
+        src="{{ reader_src[p_no - 1] }}"
         alt="Page {{ p_no }}"
       />
     </div>
 
-    <!-- Navigation Zones -->
-
-    <!-- Left Zone: Previous Page (LTR) -->
-    {% if p_no - 1 >= 1 %}
+    <!-- LEFT ZONE -->
+    {% if p_no > 1 %}
     <a
       href="/manga_reader/ch/{{ ch_no }}/p{{ p_no - 1 }}"
       class="touch-zone zone-left"
     ></a>
+    {% elif prev_ch_last_page %}
+    <a
+      href="/manga_reader/ch/{{ ch_no - 1 }}/p{{ prev_ch_last_page }}"
+      class="touch-zone zone-left"
+    ></a>
     {% else %}
-    <a href="/manga_reader/ch/{{ ch_no }}/p1" class="touch-zone zone-left"></a>
+    <span class="touch-zone zone-left"></span>
     {% endif %}
 
-    <!-- Right Zone: Next Page (LTR) -->
-    {% if p_no + 1 <= pg_last %}
+    <!-- RIGHT ZONE -->
+    {% if p_no < pg_last %}
     <a
       href="/manga_reader/ch/{{ ch_no }}/p{{ p_no + 1 }}"
       class="touch-zone zone-right"
     ></a>
+    {% elif next_ch_link %}
+    <a href="{{ next_ch_link }}" class="touch-zone zone-right"></a>
     {% else %}
-    <a
-      href="/manga_reader/ch/{{ ch_no }}/p{{ p_no }}"
-      class="touch-zone zone-right"
-    ></a>
+    <span class="touch-zone zone-right"></span>
     {% endif %}
 
-    <!-- Center Zone (Menu) -->
+    <!-- CENTER ZONE (Menu) -->
     <div class="touch-zone zone-center" onclick="toggleMenu()"></div>
 
     <!-- Menu Overlay -->
     <div id="menuOverlay" class="overlay-bg" onclick="toggleMenu()"></div>
+
+    <!-- MENU (UNCHANGED) -->
     <div id="readerMenu" class="reader-menu">
       <div style="text-align: center; margin-bottom: 10px">
         <img
-          src="{{url_for('static', filename='images/AMR_logo.svg')}}"
+          src="{{ url_for('static', filename='images/AMR_logo.svg') }}"
           alt="AMR Logo"
           style="width: 50px; height: auto"
         />
@@ -175,9 +173,12 @@
         </div>
 
         <a href="{{ next_ch_link }}" class="btn">Next Chapter</a>
-        <a href="{{ prev_ch_link }}" class="btn btn-secondary"
-          >Previous Chapter</a
+        <a
+          href="{{ prev_ch_last_page and '/manga_reader/ch/' ~ (ch_no - 1) ~ '/p' ~ prev_ch_last_page or '#' }}"
+          class="btn btn-secondary"
         >
+          Previous Chapter
+        </a>
         <a href="{{ manga_home_link }}" class="btn btn-secondary">Manga Info</a>
         <a href="/" class="btn btn-secondary">Home</a>
         <button class="btn btn-secondary" onclick="toggleMenu()">
@@ -191,41 +192,45 @@
       var chNo = {{ ch_no }};
 
       function toggleMenu() {
-          var menu = document.getElementById("readerMenu");
-          var bg = document.getElementById("menuOverlay");
-          var isVisible = menu.style.display === "block";
-
-          menu.style.display = isVisible ? "none" : "block";
-          bg.style.display = isVisible ? "none" : "block";
+        var menu = document.getElementById("readerMenu");
+        var bg = document.getElementById("menuOverlay");
+        var isVisible = menu.style.display === "block";
+        menu.style.display = isVisible ? "none" : "block";
+        bg.style.display = isVisible ? "none" : "block";
       }
 
       function goToPage() {
-          var input = document.getElementById("pageInput");
-          var p = parseInt(input.value, 10);
-          if (!isNaN(p) && p >= 1 && p <= pgLast) {
-              window.location.href = "/manga_reader/ch/" + chNo + "/p" + p;
-          }
+        var input = document.getElementById("pageInput");
+        var p = parseInt(input.value, 10);
+        if (!isNaN(p) && p >= 1 && p <= pgLast) {
+          window.location.href = "/manga_reader/ch/" + chNo + "/p" + p;
+        }
       }
 
-      // Keyboard navigation
       document.addEventListener("keydown", function(e) {
-          if (e.key === "ArrowLeft") {
-              // Left Arrow -> Prev Page (LTR)
-              {% if p_no - 1 >= 1 %}
-              window.location.href = "/manga_reader/ch/{{ ch_no }}/p{{ p_no - 1 }}";
-              {% endif %}
-          } else if (e.key === "ArrowRight") {
-              // Right Arrow -> Next Page (LTR)
-              {% if p_no + 1 <= pg_last %}
-              window.location.href = "/manga_reader/ch/{{ ch_no }}/p{{ p_no + 1 }}";
-              {% endif %}
-          } else if (e.key === "Enter") {
-               if (document.getElementById("readerMenu").style.display === "block") {
-                   goToPage();
-               } else {
-                   toggleMenu();
-               }
+        if (e.key === "ArrowLeft") {
+          {% if p_no > 1 %}
+            window.location.href = "/manga_reader/ch/{{ ch_no }}/p{{ p_no - 1 }}";
+          {% elif prev_ch_last_page %}
+            window.location.href = "/manga_reader/ch/{{ ch_no - 1 }}/p{{ prev_ch_last_page }}";
+          {% endif %}
+        }
+
+        if (e.key === "ArrowRight") {
+          {% if p_no < pg_last %}
+            window.location.href = "/manga_reader/ch/{{ ch_no }}/p{{ p_no + 1 }}";
+          {% elif next_ch_link %}
+            window.location.href = "{{ next_ch_link }}";
+          {% endif %}
+        }
+
+        if (e.key === "Enter") {
+          if (document.getElementById("readerMenu").style.display === "block") {
+            goToPage();
+          } else {
+            toggleMenu();
           }
+        }
       });
     </script>
   </body>

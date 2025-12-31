@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # have job exit if any command returns with non-zero exit status (aka failure)
-set -e
+# set -e
 
 # uninstall
 if [ -e /mnt/onboard/.AMR/uninstall.* ]

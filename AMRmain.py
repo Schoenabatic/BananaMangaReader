@@ -140,26 +140,16 @@ def GetMangaData(usr_choice):
     manga_data['ch_list']={}
 
     for chapter in chapters_list:
-        chapter_title = ''
-        chapter_url = ''
+        ch_title = ''
+        ch_link = ''
         
-        if not chapter.strip():
+        if '<a' not in chapter or 'href="' not in chapter:
             continue
-    
-        for line in chapter.split('\n'):
-            if "Chapter" in line:
-                chapter_title = line.strip()
-            
-            if 'a href' in line:
-                chapter_url = line.split('href="')[1].split('">')[0]
         
-        if not chapter_title:
-            continue
-
-        ch_title = chapter_title    
-        ch_link= chapter_url
+        ch_title = chapter.split('<a')[1].split('</a>')[0].split('>')[1].strip()
+        ch_link = chapter.split('href="')[1].split('"')[0]
         
-        ch_num = str(ch_title.replace("Chapter", "").strip())
+        ch_num = str(ch_title.strip().split(' ')[1])
         manga_data['ch_list'][ch_num]={'ch_link': ch_link,
                                        'ch_title': ch_title,
                                        'ch_update': 'N/A',
@@ -175,10 +165,16 @@ def GetChap(ch_no,p_no):
     "Accept": "application/json, text/plain, */*",
     "Referer": "https://cubari.moe/",
     "Origin": "https://cubari.moe"
+    
 }
+    # normalise types
+    ch_no = int(ch_no)
+    p_no = int(p_no)
         
     chapter_selected=ch_no
     user_selections['chapter']=ch_no #update for global tracking
+    
+    
     
     
     #! schoenbatic: open series data from the api which has the endpoints for all the chapters images
@@ -194,20 +190,42 @@ def GetChap(ch_no,p_no):
 
     reader_src = chapter_data.strip()[1:-1].split('", "')
     reader_src = [url.strip('"') for url in reader_src]  
+    
+    next_ch_link = (
+    f'/manga_reader/ch/{ch_no + 1}/p1'
+    if str(ch_no + 1) in series_data['chapters']
+    else None
+)
+    prev_ch_link = (
+    f'/manga_reader/ch/{ch_no - 1}/p1'
+    if ch_no > 1
+    else f'/manga_reader/ch/{ch_no}/p1'   
+)
+    
+    # ! schoenabatic: get last page of previous chapter
+    
+    if ch_no > 1 and str(ch_no - 1) in series_data['chapters']:
+        prev_ch_api_url = "https://cubari.moe" + series_data['chapters'][str(ch_no - 1)]['groups']['1']
+        prev_ch_data = requests.get(prev_ch_api_url, headers=headers).text
 
+        prev_reader_src = prev_ch_data.strip()[1:-1].split('", "')
+        prev_reader_src = [url.strip('"') for url in prev_reader_src]
+
+        prev_ch_last_page = len(prev_reader_src)
+    else:
+        prev_ch_last_page = None
+    
     return flask.render_template(
-        'mangareader3.html',
+        "mangareader3.html",
+        manga_title=manga_data.get("title", "Atom Manga Reader"),
         ch_no=ch_no,
-        p_no=int(p_no),
+        p_no=p_no,
         pg_last=len(reader_src),
         reader_src=reader_src,
-        next_ch_link='#',
-        prev_ch_link='#',
-        manga_home_link='#'
+        next_ch_link=next_ch_link,
+        prev_ch_last_page=prev_ch_last_page,
+        manga_home_link="#"
     )
-
-    
-        
         
         #look for <div class="container-chapter-reader">
     #     pg_data=chapter_data.split('<div class="container-chapter-reader">')[1].split('\n')[1].split('<img src')
